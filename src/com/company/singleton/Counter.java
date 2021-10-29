@@ -19,6 +19,7 @@ public class Counter {
 
 
     public static void main(String[] args) {
+
         Counter obj1 = Counter.getInstance();
         Counter obj2 = Counter.getInstance();
         obj1.addOne();
