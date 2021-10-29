@@ -14,6 +14,4 @@ public class Director {
         builder.builderLicensePlate(licensePlate);
         builder.builderBrand(brand);
     }
-
-
 }
