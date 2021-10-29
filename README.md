@@ -217,3 +217,122 @@ Image name: A new image
 -----End-----
 
 ```
+
+##
+## Builder
+The builder pattern is used to create complex objects with constituent parts that must be created in the same order or using a specific algorithm. An external class controls the construction algorithm.
+
+### Example: Java
+
+```java
+public class Car {
+    private String color;
+    private String licensePlate;
+    private String brand;
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "color='" + color + '\'' +
+                ", licensePlate='" + licensePlate + '\'' +
+                ", brand='" + brand + '\'' +
+                '}';
+    }
+}
+
+```
+
+```java
+public interface Builder {
+    void builderColor(String color);
+
+    void builderLicensePlate(String licensePlate);
+
+    void builderBrand(String brand);
+
+    Car build();
+}
+
+```
+
+```java
+public class CarBuilder implements Builder {
+
+    Car car;
+
+    public CarBuilder() {
+        car = new Car();
+    }
+
+    @Override
+    public void builderColor(String color) {
+        car.setColor(color);
+    }
+
+    @Override
+    public void builderLicensePlate(String licensePlate) {
+        car.setLicensePlate(licensePlate);
+    }
+
+    @Override
+    public void builderBrand(String brand) {
+        car.setBrand(brand);
+    }
+
+    @Override
+    public Car build() {
+        return car;
+    }
+}
+
+```
+
+```java
+public class Director {
+
+    Builder builder;
+
+    public Director(Builder builder) {
+        this.builder = builder;
+    }
+
+
+    public void construct(String color, String licensePlate, String brand) {
+        builder.builderColor(color);
+        builder.builderLicensePlate(licensePlate);
+        builder.builderBrand(brand);
+    }
+}
+
+```
+
+### Usage :
+
+```java
+    Builder builder = new CarBuilder();
+    Director director = new Director(builder);
+    director.construct("Red","A88888","Ferrari");
+    System.out.println(builder.build().toString());
+```
+
+### Outpu:
+
+```code
+Car{color='Red', licensePlate='A88888', brand='Ferrari'}
+```
+
+
+
+
