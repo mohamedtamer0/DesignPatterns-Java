@@ -42,6 +42,10 @@
 
 The singleton pattern ensures that only one object of a particular class is ever created. All further references to objects of the singleton class refer to the same underlying instance. There are very few applications, do not overuse this pattern!
 
+## UML :
+
+<img src="https://user-images.githubusercontent.com/51374446/139603038-66b99d0b-9c34-4f6f-ae14-5277fd2a814b.jpg" style="width:300px;height:300px"/>
+
 ### Example:
 
 ```java
@@ -96,6 +100,10 @@ The Prototype pattern delegates the cloning process to the actual objects that a
 The implementation of the clone method is very similar in all classes. The method creates an object of the current class and carries over all of the field values of the old object into the new one. You can even copy private fields because most programming languages let objects access private fields of other objects that belong to the same class.
 
 An object that supports cloning is called a prototype. When your objects have dozens of fields and hundreds of possible configurations, cloning them might serve as an alternative to subclassing.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/prototype.png"/>
 
 ### Example:
 
@@ -222,6 +230,10 @@ Image name: A new image
 ## Builder
 The builder pattern is used to create complex objects with constituent parts that must be created in the same order or using a specific algorithm. An external class controls the construction algorithm.
 
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/builder.png"/>
+
 ### Example:
 
 ```java
@@ -340,6 +352,10 @@ Car{color='Red', licensePlate='A88888', brand='Ferrari'}
 ## Factory Method
 The factory pattern is used to replace class constructors, abstracting the process of object generation so that the type of the object instantiated can be determined at run-time.
 
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/factory_method.png"/>
+
 ### Example:
 
 ```java
@@ -415,6 +431,10 @@ Baking ten minutes
 ##
 ## Abstract Factory
 The abstract factory pattern is used to provide a client with a set of related or dependant objects. The "family" of objects created by the factory are determined at run-time.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/abstract_factory.png"/>
 
 ### Example:
 
@@ -511,6 +531,11 @@ Square Style
 ## Protection Proxy
 The proxy pattern is used to provide a surrogate or placeholder object, which references an underlying object. Protection proxy is restricting access.
 
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/proxy.png"/>
+
 ### Example:
 
 ```java
@@ -599,6 +624,10 @@ Signature Acceptance
 ## Decorator
 The decorator pattern is used to extend or alter the functionality of objects at run-time by wrapping them in an object of a decorator class. This provides a flexible alternative to using inheritance to modify behaviour.
 
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/decorator.png"/>
+
 ### Example:
 
 ```java
@@ -681,6 +710,10 @@ Baking Cake
 ## Adapter
 The adapter pattern is used to provide a link between two otherwise incompatible types by wrapping the "adaptee" with a class that supports the interface required by the client.
 
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/class_adapter.png"/>
+
 ### Example:
 
 ```java
@@ -744,6 +777,10 @@ After adapter, the volt is :5
 
 ## Facade
 The facade pattern is used to define a simplified interface to a more complex subsystem.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/facade.png"/>
 
 ### Example:
 
