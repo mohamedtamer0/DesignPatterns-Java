@@ -336,3 +336,562 @@ Car{color='Red', licensePlate='A88888', brand='Ferrari'}
 
 
 
+##
+## Factory Method
+The factory pattern is used to replace class constructors, abstracting the process of object generation so that the type of the object instantiated can be determined at run-time.
+
+### Example:
+
+```java
+public interface Cake {
+    void prepareMaterials();
+
+    void baking();
+}
+
+```
+
+```java
+public class MangoCake implements Cake{
+    @Override
+    public void prepareMaterials() {
+        System.out.println("prepare Mango Cream");
+    }
+
+    @Override
+    public void baking() {
+        System.out.println("Baking ten minutes");
+    }
+}
+
+```
+
+```java
+public abstract class Factory {
+    public abstract <T extends Cake> T createProduct(Class<T> clz);
+}
+
+```
+
+```java
+public class CakeFactory extends Factory{
+
+    @Override
+    public <T extends Cake> T createProduct(Class<T> clz) {
+        Cake cake = null;
+        try {
+            cake = (Cake) Class.forName(clz.getName()).getDeclaredConstructor().newInstance();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  (T) cake;
+    }
+}
+
+
+```
+
+
+
+### Usage :
+
+```java
+    Factory factory = new CakeFactory();
+    MangoCake mangoCake = factory.createProduct(MangoCake.class);
+    mangoCake.prepareMaterials();
+    mangoCake.baking();
+```
+
+### Outpu:
+
+```code
+prepare Mango Cream
+Baking ten minutes
+```
+
+
+
+
+##
+## Abstract Factory
+The abstract factory pattern is used to provide a client with a set of related or dependant objects. The "family" of objects created by the factory are determined at run-time.
+
+### Example:
+
+```java
+public abstract class CakeFactory {
+    public abstract CakeCream cream();
+    public abstract CakeStyle style();
+}
+
+```
+
+```java
+public abstract class CakeCream {
+    public abstract void cream();
+}
+
+```
+
+```java
+public abstract class CakeStyle {
+    public abstract void style();
+}
+
+```
+
+```java
+public class HeartStyle extends CakeStyle{
+    @Override
+    public void style() {
+        System.out.println("Heart Style");
+    }
+}
+
+```
+
+```java
+public class MangoCream extends CakeCream{
+    @Override
+    public void cream() {
+        System.out.println("Mango Cream");
+    }
+}
+
+
+```
+
+```java
+public class MangoHeartCake extends CakeFactory{
+    @Override
+    public CakeCream cream() {
+        return new MangoCream() ;
+    }
+
+    @Override
+    public CakeStyle style() {
+        return new HeartStyle();
+    }
+}
+
+
+```
+
+
+
+
+### Usage :
+
+```java
+    CakeFactory mangoHeartCake  = new MangoHeartCake();
+    mangoHeartCake.cream().cream();
+    mangoHeartCake.style().style();
+
+    System.out.println("=================");
+
+    CakeFactory mangoSquareCake = new MangoSquareCake();
+    mangoSquareCake.cream().cream();
+    mangoSquareCake.style().style();
+```
+
+### Outpu:
+
+```code
+Mango Cream
+Heart Style
+=================
+Mango Cream
+Square Style
+```
+
+
+##
+## Structural Patterns : 
+
+## Protection Proxy
+The proxy pattern is used to provide a surrogate or placeholder object, which references an underlying object. Protection proxy is restricting access.
+
+### Example:
+
+```java
+public interface IPicker {
+    void receiveMessage();
+
+    void takeCourier();
+
+    void signatureAcceptance();
+
+}
+
+```
+
+```java
+public class RealPicker implements IPicker{
+    @Override
+    public void receiveMessage() {
+        System.out.println("Receive text Message");
+    }
+
+    @Override
+    public void takeCourier() {
+        System.out.println("Take the Courier");
+    }
+
+    @Override
+    public void signatureAcceptance() {
+        System.out.println("Signature Acceptance");
+    }
+}
+
+
+```
+
+```java
+public class ProxyPicker implements IPicker {
+
+    private IPicker picker;
+
+    public ProxyPicker(IPicker picker) {
+        this.picker = picker;
+    }
+
+    @Override
+    public void receiveMessage() {
+        picker.receiveMessage();
+    }
+
+    @Override
+    public void takeCourier() {
+        picker.takeCourier();
+    }
+
+    @Override
+    public void signatureAcceptance() {
+        picker.signatureAcceptance();
+    }
+}
+
+```
+
+
+
+### Usage :
+
+```java
+    IPicker picker = new RealPicker();
+    ProxyPicker proxyPicker = new ProxyPicker(picker);
+
+    proxyPicker.receiveMessage();
+    proxyPicker.takeCourier();
+    proxyPicker.signatureAcceptance();
+```
+
+### Outpu:
+
+```code
+Receive text Message
+Take the Courier
+Signature Acceptance
+```
+
+
+
+## Decorator
+The decorator pattern is used to extend or alter the functionality of objects at run-time by wrapping them in an object of a decorator class. This provides a flexible alternative to using inheritance to modify behaviour.
+
+### Example:
+
+```java
+public interface Cake {
+
+    void make();
+}
+
+```
+
+```java
+public class CakeEmbryo implements Cake{
+    @Override
+    public void make() {
+        System.out.println("Baking Cake");
+    }
+}
+
+```
+
+```java
+public abstract class DecoratorCake implements Cake {
+    Cake cake;
+
+    public DecoratorCake(Cake cake) {
+        this.cake = cake;
+    }
+
+    @Override
+    public void make() {
+        cake.make();
+    }
+}
+
+```
+
+```java
+public class FruitCake extends DecoratorCake{
+
+    public FruitCake(Cake cake) {
+        super(cake);
+    }
+
+    @Override
+    public void make() {
+        addSomeFruit();
+        super.make();
+    }
+
+    private void addSomeFruit(){
+        System.out.println("Add Some fruit");
+    }
+}
+
+```
+
+
+
+### Usage :
+
+```java
+    Cake cake = new CakeEmbryo();
+    cake.make();
+
+    System.out.println("--------Decorate Fruit Cake--------");
+    DecoratorCake fruitCake = new FruitCake(cake);
+    fruitCake.make();
+```
+
+### Outpu:
+
+```code
+Baking Cake
+--------Decorate Fruit Cake--------
+Add Some fruit
+Baking Cake
+```
+
+
+## Adapter
+The adapter pattern is used to provide a link between two otherwise incompatible types by wrapping the "adaptee" with a class that supports the interface required by the client.
+
+### Example:
+
+```java
+public interface VoltFive {
+    int provideVoltFive();
+}
+
+```
+
+```java
+public class Volt220 {
+    public int provideVolt220(){
+        return 220;
+    }
+}
+
+```
+
+```java
+public class VoltAdapter implements VoltFive{
+
+    private Volt220 volt220;
+
+    public VoltAdapter(Volt220 volt220) {
+        this.volt220 = volt220;
+    }
+
+    @Override
+    public int provideVoltFive() {
+        int volt = volt220.provideVolt220();
+        return 5;
+    }
+
+    public int provideVolt220() {
+        return  volt220.provideVolt220();
+    }
+
+}
+
+```
+
+
+### Usage :
+
+```java
+    Volt220 volt220 = new Volt220();
+    VoltAdapter adapter = new VoltAdapter(volt220);
+
+    int volt = adapter.provideVoltFive();
+    System.out.println("After adapter, the volt is :" + volt);
+```
+
+### Outpu:
+
+```code
+After adapter, the volt is :5
+```
+
+
+
+
+## Facade
+The facade pattern is used to define a simplified interface to a more complex subsystem.
+
+### Example:
+
+```java
+public interface Italykitchen {
+
+    void lasagneWithTomatoAndCheese();
+
+    void prawnRisotto();
+
+    void creamCaramel();
+
+
+}
+
+```
+
+```java
+public class ItalykitchenImpl implements Italykitchen{
+    @Override
+    public void lasagneWithTomatoAndCheese() {
+        System.out.println("Lasagne With Tomato And Cheese");
+    }
+
+    @Override
+    public void prawnRisotto() {
+        System.out.println("Prawn Risotto");
+    }
+
+    @Override
+    public void creamCaramel() {
+        System.out.println("Cream Caramel");
+    }
+}
+
+```
+
+```java
+public interface Frenchkitchen {
+
+     void bouillabaisse();
+
+     void cassoulet();
+
+     void pouleAuPot();
+}
+
+
+```
+
+```java
+public class FrenchkitchenImpl implements Frenchkitchen{
+    @Override
+    public void bouillabaisse() {
+        System.out.println("Bouillabaisse");
+    }
+
+    @Override
+    public void cassoulet() {
+        System.out.println("Cassoulet");
+    }
+
+    @Override
+    public void pouleAuPot() {
+        System.out.println("PouleAuPot");
+    }
+}
+
+
+```
+
+```java
+public class Menu {
+    private  Italykitchen italykitchen;
+    private Frenchkitchen frenchkitchen;
+
+    public Menu() {
+        italykitchen = new ItalykitchenImpl();
+        frenchkitchen = new FrenchkitchenImpl();
+    }
+
+
+    public void bouillabaisse() {
+        frenchkitchen.bouillabaisse();
+    }
+
+    public void cassoulet() {
+        frenchkitchen.cassoulet();
+    }
+
+    public void pouleAuPot() {
+        frenchkitchen.pouleAuPot();
+    }
+
+    public void lasagneWithTomatoAndCheese() {
+        italykitchen.lasagneWithTomatoAndCheese();
+    }
+
+    public void prawnRisotto() {
+        italykitchen.prawnRisotto();
+    }
+
+    public void creamCaramel() {
+        italykitchen.creamCaramel();
+    }
+
+
+}
+
+```
+
+
+### Usage :
+
+```java
+    Menu menu = new Menu();
+
+    System.out.println("Customer order");
+    menu.lasagneWithTomatoAndCheese();
+    menu.creamCaramel();
+
+    System.out.println("===========New Order==========");
+    System.out.println("Customer two orders");
+    menu.bouillabaisse();
+    menu.prawnRisotto();
+```
+
+### Outpu:
+
+```code
+Customer order
+Lasagne With Tomato And Cheese
+Cream Caramel
+===========New Order==========
+Customer two orders
+Bouillabaisse
+Prawn Risotto
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
