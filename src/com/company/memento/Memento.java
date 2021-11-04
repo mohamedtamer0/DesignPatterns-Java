@@ -1,7 +1,6 @@
 package com.company.memento;
 
 public class Memento {
-
     private String mDate;
     private String mTodo;
     private boolean mIsFinish;

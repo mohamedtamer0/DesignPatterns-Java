@@ -8,10 +8,13 @@ public class Client {
 
         Caretaker caretaker = new Caretaker();
         caretaker.archive(toDo.createMemoto());
+
         System.out.println(toDo.toString());
+
         ToDo newToDo = new ToDo();
         newToDo.restore(caretaker.getMemoto());
         newToDo.setIsFinish(true);
+
         System.out.println(newToDo.toString());
     }
 }
