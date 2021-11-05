@@ -927,9 +927,359 @@ Prawn Risotto
 ```
 
 
+## Flyweight
+Flyweight is a structural design pattern that lets you fit more objects into the available amount of RAM by sharing common parts of state between multiple objects instead of keeping all of the data in each object.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/flyweight.png"/>
+
+### Example:
+
+```java
+public interface Ticket {
+    public void printTicket(String time, String seat);
+}
+
+```
+
+```java
+public class TicketFactory {
+
+    private static Map<String, Ticket> map = new ConcurrentHashMap<>();
+
+    public static Ticket getTicket(String movieName) {
+        if (map.containsKey(movieName)) {
+            return map.get(movieName);
+        } else {
+            Ticket ticket = new MovieTicket(movieName);
+            map.put(movieName, ticket);
+            return ticket;
+        }
+    }
+
+}
+
+```
+
+```java
+public class MovieTicket implements Ticket {
+
+    private String movieName;
+    private String price;
+
+    public MovieTicket(String movieName){
+        this.movieName = movieName;
+        price = "Price " + new Random().nextInt(100);
+    }
+
+    @Override
+
+    public void printTicket(String time, String seat) {
+        System.out.println("+-------------------+");
+        System.out.printf("| %-12s    |\n", movieName);
+        System.out.println("|                   |");
+        System.out.printf("|       %-12s|\n", time);
+        System.out.printf("|       %-12s|\n", seat);
+        System.out.printf("|       %-12s|\n", price);
+        System.out.println("|                   |");
+        System.out.println("+-------------------+");
+    }
+}
+
+```
 
 
 
+### Usage :
+
+```java
+    MovieTicket movieTicket1 = (MovieTicket) TicketFactory.getTicket("Transformers 5");
+    movieTicket1.printTicket("14:00-16:30", "Seat  D-5");
+    MovieTicket movieTicket2 = (MovieTicket) TicketFactory.getTicket("Transformers 5");
+    movieTicket2.printTicket("14:00-16:30", "Seat  F-6");
+    MovieTicket movieTicket3 = (MovieTicket) TicketFactory.getTicket("Transformers 5");
+    movieTicket3.printTicket("18:00-22:30", "Seat  A-2");
+```
+
+### Outpu:
+
+```code
++-------------------+
+| Transformers 5    |
+|                   |
+|       14:00-16:30 |
+|       Seat  D-5   |
+|       Price 33    |
+|                   |
++-------------------+
++-------------------+
+| Transformers 5    |
+|                   |
+|       14:00-16:30 |
+|       Seat  F-6   |
+|       Price 33    |
+|                   |
++-------------------+
++-------------------+
+| Transformers 5    |
+|                   |
+|       18:00-22:30 |
+|       Seat  A-2   |
+|       Price 33    |
+|                   |
++-------------------+
+
+```
+
+
+
+
+##
+## Behavioral Patterns : 
+
+>In software engineering, behavioral design patterns are design patterns that identify common communication patterns between objects and realize these patterns. By doing so, these patterns increase flexibility in carrying out this communication.
+>
+
+
+## Template Method
+Template Method is a behavioral design pattern that defines the skeleton of an algorithm in the superclass but lets subclasses override specific steps of the algorithm without changing its structure.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/template_method.png"/>
+
+### Example:
+
+```java
+public abstract class AssemblyLine {
+    
+    protected void onProduceShell() {
+        System.out.println("Produce Shell");
+    }
+
+    protected void onProduceComponents() {
+        System.out.println("Produce some components");
+    }
+
+    protected void onAssemblyComponents() {
+        System.out.println("Assembly Components");
+    }
+
+    protected void onTestProducts() {
+        System.out.println("Test Products");
+    }
+
+    protected void onProductPacking() {
+        System.out.println("Product Packing");
+    }
+
+    public final void product() {
+        System.out.println("+------Start Product------+");
+        onProduceShell();
+        onProduceComponents();
+        onAssemblyComponents();
+        onTestProducts();
+        onProduceComponents();
+        onProductPacking();
+        System.out.println("+------Finish Product------+");
+    }
+
+}
+
+```
+
+```java
+public class ComputerAssemblyLine extends AssemblyLine{
+
+    @Override
+    protected void onProduceShell() {
+        System.out.println("Product Aluminum housing and Liquid Crystal Display");
+    }
+
+    @Override
+    protected void onProduceComponents() {
+        System.out.println("Product Components and keyboard");
+    }
+
+    @Override
+    protected void onProductPacking() {
+        System.out.println("Pack and Mark the Apple trademark");
+    }
+}
+```
+
+```java
+public class RadioAssemblyLine extends AssemblyLine{
+
+    @Override
+    protected void onProduceComponents() {
+        System.out.println("Product Radio Components and Antennas");
+    }
+}
+
+
+```
+
+
+
+### Usage :
+
+```java
+    AssemblyLine assemblyLine = new ComputerAssemblyLine();
+    assemblyLine.product();
+
+    System.out.println();
+
+    assemblyLine = new RadioAssemblyLine();
+    assemblyLine.product();
+```
+
+### Outpu:
+
+```code
++------Start Product------+
+Product Aluminum housing and Liquid Crystal Display
+Product Components and keyboard
+Assembly Components
+Test Products
+Product Components and keyboard
+Pack and Mark the Apple trademark
++------Finish Product------+
+
++------Start Product------+
+Produce Shell
+Product Radio Components and Antennas
+Assembly Components
+Test Products
+Product Radio Components and Antennas
+Product Packing
++------Finish Product------+
+
+```
+
+
+## Chain of Responsibility
+The chain of responsibility pattern is used to process varied requests, each of which may be dealt with by a different handler.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/chain_of_responsibility.png"/>
+
+### Example:
+
+```java
+public abstract class Handler {
+
+    protected Handler successor;
+
+    public abstract int capital();
+
+    public abstract void handle(int money);
+
+    public final void handleRequest(int money) {
+        if (money <= capital()) {
+            handle(money);
+        }else {
+            if (null != successor) {
+                successor.handleRequest(money);
+            }else {
+                System.out.println("Your requested funds could not be approved");
+            }
+        }
+    }
+
+}
+
+```
+
+```java
+public class Tutor extends Handler{
+    @Override
+    public int capital() {
+        return 100;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("Approved by the instructor: approved " + money + " Dollar");
+    }
+}
+```
+
+```java
+public class Secretary extends Handler {
+    @Override
+    public int capital() {
+        return 1000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("Secretary approved: approved " + money + " Dollar");
+    }
+}
+
+
+```
+
+```java
+public class Principal extends Handler {
+    @Override
+    public int capital() {
+        return 1000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("Approved by the principal: approved " + money + " Dollar");
+    }
+}
+
+
+```
+
+```java
+public class Dean extends Handler {
+    @Override
+    public int capital() {
+        return 5000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("Dean approved: approved " + money + " Dollar");
+    }
+}
+
+```
+
+
+
+### Usage :
+
+```java
+        Tutor tutor = new Tutor();
+        Secretary secretary = new Secretary();
+        Dean dean = new Dean();
+        Principal principal = new Principal();
+
+        tutor.successor = secretary;
+        secretary.successor = dean;
+        dean.successor = principal;
+        principal.successor = null;
+
+        tutor.handleRequest(12000);
+        secretary.handleRequest(100);
+```
+
+### Outpu:
+
+```code
+Your requested funds could not be approved
+Secretary approved: approved 100 Dollar
+
+```
 
 
 
