@@ -1283,6 +1283,1009 @@ Secretary approved: approved 100 Dollar
 
 
 
+## Command
+The command pattern is used to express a request, including the call to be made and all of its required parameters, in a command object. The command may then be executed immediately or held for later use.
+
+## UML :
+
+<img src="https://user-images.githubusercontent.com/51374446/140611296-48c950e8-1969-4b77-a260-adc682472754.png"/>
+
+
+### Example:
+
+```java
+public interface OrderCommand {
+    void execute();
+}
+
+```
+
+```java
+public class OrderPayCommand implements OrderCommand{
+
+    public Long id;
+
+    public OrderPayCommand(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public void execute() {
+        System.out.println("Paying for order with id : " + id);
+    }
+}
+
+```
+
+```java
+public class OrderAddCommand implements OrderCommand{
+    public Long id;
+
+    public OrderAddCommand(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public void execute() {
+        System.out.println("Adding Order With id : " + id);
+    }
+}
+
+```
+
+```java
+public class CommandProcessor {
+
+    ArrayList<OrderCommand> queue = new ArrayList<>();
+
+    public void addToQueue(OrderCommand orderCommand) {
+        queue.add(orderCommand);
+    }
+
+    public void processCommands() {
+        queue.forEach(OrderCommand::execute);
+        queue.clear();
+    }
+}
+
+```
+
+
+### Usage :
+
+```java
+    CommandProcessor obj = new CommandProcessor();
+    obj.addToQueue(new OrderAddCommand(1L));
+    obj.addToQueue(new OrderAddCommand(2L));
+    obj.addToQueue(new OrderPayCommand(2L));
+    obj.addToQueue(new OrderPayCommand(1L));
+    obj.processCommands();
+```
+
+### Outpu:
+
+```code
+Adding Order With id : 1
+Adding Order With id : 2
+Paying for order with id : 2
+Paying for order with id : 1
+
+```
+
+
+
+## Iterator
+Iterator is a behavioral design pattern that lets you traverse elements of a collection without exposing its underlying representation (list, stack, tree, etc.).
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/iterator.png"/>
+
+
+### Example:
+
+```java
+public interface Iterator<T> {
+    boolean hasNext();
+    T next();
+}
+
+```
+
+```java
+public interface BookIterable<T> {
+    Iterator<T> iterator();
+}
+
+```
+
+```java
+public class Book {
+
+    private String name;
+    private String ISBN;
+    private String press;
+
+    public Book(String name, String ISBN, String press) {
+        this.name = name;
+        this.ISBN = ISBN;
+        this.press = press;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "name='" + name + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", press='" + press + '\'' +
+                '}';
+    }
+
+        /*
+        Don't forget geeter and setter !!!!
+        */
+```
+
+```java
+public class Literature implements BookIterable{
+
+    private Book[] literature;
+
+    public Literature() {
+        literature = new Book[4];
+        literature[0] = new Book("Three Kingdoms", "9787532237357", "Shanghai People's Fine Arts Publishing House");
+        literature[1] = new Book("Journey to the West", "9787805200552", "Yuelu Publishing House");
+        literature[2] = new Book("Water Margin", "9787020015016", "People's Literature Publishing House");
+        literature[3] = new Book("Dream of Red Mansions", "9787020002207", "People's Literature Publishing House");
+    }
+
+    public Book[] getLiterature() {
+        return literature;
+    }
+
+    @Override
+    public Iterator iterator() {
+        return new LiteratureIterator(literature);
+    }
+}
+```
+
+```java
+public class LiteratureIterator  implements Iterator{
+
+
+    private Book[] literatures;
+
+    private int index;
+
+    public LiteratureIterator(Book[] literatures) {
+        this.literatures = literatures;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return (index < literatures.length - 1 && literatures[index] != null);
+    }
+
+    @Override
+    public Book next() {
+        return literatures[index++];
+    }
+}
+```
+
+
+
+### Usage :
+
+```java
+    public static void main(String[] args) {
+        Literature literature = new Literature();
+        itr(literature.iterator());
+        
+    }
+
+    private static void itr(Iterator iterator) {
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+```
+
+### Outpu:
+
+```code
+Book{name='Three Kingdoms', ISBN='9787532237357', press='Shanghai People's Fine Arts Publishing House'}
+Book{name='Journey to the West', ISBN='9787805200552', press='Yuelu Publishing House'}
+Book{name='Water Margin', ISBN='9787020015016', press='People's Literature Publishing House'}
+```
+
+
+
+## Mediator
+Mediator design pattern is used to provide a centralized communication medium between different objects in a system. This pattern is very helpful in an enterprise application where multiple objects are interacting with each other.
+
+## UML :
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Mediator_design_pattern.png"/>
+
+
+### Example:
+
+```java
+public interface ChatMediator {
+    void sendMessage(String msg, User user);
+    void addUser(User user);
+}
+
+```
+
+```java
+public abstract class User {
+    protected ChatMediator mediator;
+    protected String name;
+
+    public User(ChatMediator med, String name) {
+        this.mediator = med;
+        this.name = name;
+    }
+
+    public abstract void send(String msg);
+    public abstract void receive(String msg);
+}
+
+```
+
+```java
+public class ChatMediatorImpl implements ChatMediator {
+    private final List<User> users;
+
+    public ChatMediatorImpl() { this.users = new ArrayList<>(); }
+
+    @Override
+    public void addUser(User user) {
+        this.users.add(user);
+    }
+
+    @Override
+    public void sendMessage(String msg, User toUser) {
+        for (User user : users) {
+            //Message should not be received by the user sending it.
+            if(user != toUser) { user.receive(msg); }
+        }
+    }
+}
+```
+
+```java
+public class UserImpl extends User {
+    public UserImpl(ChatMediator med, String name) {
+        super(med, name);
+    }
+
+    @Override
+    public void send(String msg) {
+        System.out.println(this.name + ": Sending Message = " + msg);
+        mediator.sendMessage(msg, this);
+    }
+
+    @Override
+    public void receive(String msg) {
+        System.out.println(this.name + ": Message received: " + msg);
+    }
+}
+```
+
+
+
+### Usage :
+
+```java
+    ChatMediator mediator = new ChatMediatorImpl();
+    User user1 = new UserImpl(mediator, "Tamer");
+    User user2 = new UserImpl(mediator, "Mohab");
+    User user3 = new UserImpl(mediator, "Mohand");
+    User user4 = new UserImpl(mediator, "Habiba");
+
+    mediator.addUser(user1);
+    mediator.addUser(user2);
+    mediator.addUser(user3);
+    mediator.addUser(user4);
+
+    user1.send("Hi everyone!");
+```
+
+### Outpu:
+
+```code
+Mohab: Message received: Hi everyone!
+Mohand: Message received: Hi everyone!
+Habiba: Message received: Hi everyone!
+```
+
+
+
+
+## Memento
+The memento pattern is a software design pattern that provides the ability to restore an object to its previous state (undo via rollback).
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/innofang/designpatterns/master/uml/memento.png"/>
+
+
+### Example:
+
+```java
+public class Memento {
+    private String mDate;
+    private String mTodo;
+    private boolean mIsFinish;
+
+    public void setDate(String date) {
+        mDate = date;
+    }
+
+    public String getDate() {
+        return mDate;
+    }
+
+    public String getTodo() {
+        return mTodo;
+    }
+
+    public void setTodo(String mTodo) {
+        this.mTodo = mTodo;
+    }
+
+    public boolean isFinish() {
+        return mIsFinish;
+    }
+
+    public void setIsFinish(boolean mIsFinish) {
+        this.mIsFinish = mIsFinish;
+    }
+
+    @Override
+    public String toString() {
+        return "memento{" +
+                "Date='" + mDate + '\'' +
+                ", Todo='" + mTodo + '\'' +
+                ", IsFinish=" + mIsFinish +
+                '}';
+    }
+}
+
+```
+
+```java
+public class Caretaker {
+    private Memento mMemoto;
+
+    public void archive(Memento memoto) {
+        mMemoto = memoto;
+    }
+
+    public Memento getMemoto() {
+        return mMemoto;
+    }
+}
+
+```
+
+```java
+public class ToDo {
+    private String mDate;
+    private String mTodo;
+    private boolean mIsFinish;
+
+    public ToDo() {
+        mDate = new SimpleDateFormat("yyyy/MM/dd EE HH:mm:ss").format(new Date());
+    }
+
+    public void setToDoDetail(String todo, boolean isFinish) {
+        mTodo = todo;
+        mIsFinish = isFinish;
+    }
+
+    public Memento createMemoto() {
+        Memento memento = new Memento();
+        memento.setDate(mDate);
+        memento.setTodo(mTodo);
+        memento.setIsFinish(mIsFinish);
+        return memento;
+    }
+
+    public void restore(Memento memento) {
+        mDate = memento.getDate();
+        mTodo = memento.getTodo();
+        mIsFinish = memento.isFinish();
+    }
+
+    public String getDate() {
+        return mDate;
+    }
+
+    public String getTodo() {
+        return mTodo;
+    }
+
+    public void setTodo(String mTodo) {
+        this.mTodo = mTodo;
+    }
+
+    public boolean isIsFinish() {
+        return mIsFinish;
+    }
+
+    public void setIsFinish(boolean mIsFinish) {
+        this.mIsFinish = mIsFinish;
+    }
+
+    @Override
+    public String toString() {
+        return "ToDo{" +
+                "Date='" + mDate + '\'' +
+                ", Todo='" + mTodo + '\'' +
+                ", IsFinish=" + mIsFinish +
+                '}';
+    }
+}
+```
+
+
+
+
+### Usage :
+
+```java
+    ToDo toDo = new ToDo();
+
+    toDo.setToDoDetail("Write Java at 2 pm", false);
+
+    Caretaker caretaker = new Caretaker();
+    caretaker.archive(toDo.createMemoto());
+
+    System.out.println(toDo.toString());
+
+    ToDo newToDo = new ToDo();
+    newToDo.restore(caretaker.getMemoto());
+    newToDo.setIsFinish(true);
+
+    System.out.println(newToDo.toString());
+```
+
+### Outpu:
+
+```code
+ToDo{Date='2021/11/06 Sat 16:04:55', Todo='Write Java at 2 pm', IsFinish=false}
+ToDo{Date='2021/11/06 Sat 16:04:55', Todo='Write Java at 2 pm', IsFinish=true}
+```
+
+
+
+
+## Observer
+The observer pattern is used to allow an object to publish changes to its state. Other objects subscribe to be immediately notified of any changes.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/observer.png"/>
+
+
+### Example:
+
+```java
+public interface Observer {
+    public void update(String magazine);
+}
+
+```
+
+```java
+public interface Subject {
+     void registerObserver(Observer observer);
+     void removeObserver(Observer observer);
+     void notifyObservers();
+}
+
+```
+
+```java
+public class Magazine implements Subject{
+    private List<Observer> observerList;
+    private String magazine;
+
+    public Magazine() {
+        observerList = new ArrayList<>();
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observerList.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observerList.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (int i = 0; i < observerList.size(); i++) {
+            Observer observer= observerList.get(i);
+            observer.update(magazine);
+        }
+    }
+    
+    public void setMagazine(String magazine) {
+        this.magazine = magazine;
+        notifyObservers();
+    }
+
+}
+
+```
+
+```java
+public class Subscriber implements Observer {
+
+    private final String subscriber;
+
+    public Subscriber(Subject magazine, String subscriber) {
+        magazine.registerObserver(this);
+        this.subscriber = subscriber;
+    }
+
+    @Override
+    public void update(String magazine) {
+        System.out.println("Dear" + subscriber + ": Your magazine has arrived, and today’s magazine is called《" + magazine +"》");
+    }
+}
+```
+
+```java
+public class Bookstore implements Observer{
+    public Bookstore(Subject magazine) {
+        magazine.registerObserver(this);
+    }
+
+    @Override
+    public void update(String magazine) {
+        System.out.println("Our shop updates the magazine today：《" + magazine+ "》");
+    }
+}
+```
+
+
+
+### Usage :
+
+```java
+    Magazine magazine = new Magazine();
+
+    Subscriber mohamed = new Subscriber(magazine, "Mohamed");
+    Subscriber tamer = new Subscriber(magazine, "Tamer");
+    Subscriber habiba = new Subscriber(magazine, "Habiba");
+    Bookstore bookstore = new Bookstore(magazine);
+
+    magazine.setMagazine("Shock! Today's magazine since...");
+```
+
+### Outpu:
+
+```code
+DearMohamed: Your magazine has arrived, and today’s magazine is called《Shock! Today's magazine since...》
+DearTamer: Your magazine has arrived, and today’s magazine is called《Shock! Today's magazine since...》
+DearHabiba: Your magazine has arrived, and today’s magazine is called《Shock! Today's magazine since...》
+Our shop updates the magazine today：《Shock! Today's magazine since...》
+```
+
+
+
+
+## State
+The state pattern is used to alter the behaviour of an object as its internal state changes. The pattern allows the class for an object to apparently change at run-time.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/state.png"/>
+
+
+### Example:
+
+```java
+public interface GameState {
+    void killMonster();
+    void gainExperience();
+    void next();
+    void pick();
+}
+
+```
+
+```java
+public class Player {
+
+    GameState state;
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public void gameStart() {
+        setState(new GameStartState());
+        System.out.println("\n-----Game Start, ready to fight-----\n");
+    }
+
+    public void gameOver() {
+        setState(new GameOverState());
+        System.out.println("\n-----         Game Over        -----\n");
+    }
+
+    public void killMonster() {
+        state.killMonster();
+    }
+
+    public void gainExperience() {
+        state.gainExperience();
+    }
+
+    public void next() {
+        state.next();
+    }
+
+    public void pick() {
+        state.pick();
+    }
+    
+}
+
+```
+
+```java
+public class GameStartState implements GameState {
+
+    @Override
+    public void killMonster() {
+        System.out.println("Kill a Monster");
+    }
+    
+    @Override
+    public void gainExperience() {
+        System.out.println("Gain 5 EXP");
+    }
+    
+    @Override
+    public void next() {
+        System.out.println("Good! please enter next level");
+    }
+    
+    @Override
+    public void pick() {
+        System.out.println("Wow! You pick a good thing");
+    }
+}
+
+```
+
+```java
+public class GameOverState implements GameState {
+
+    @Override
+    public void killMonster() {
+        System.out.println("Please start game first");
+    }
+
+    @Override
+    public void gainExperience() {}
+
+    @Override
+    public void next() {
+        System.out.println("You want to challenge again?");
+    }
+
+    @Override
+    public void pick() {
+        System.out.println("Please start game first");
+    }
+}
+```
+
+
+
+### Usage :
+
+```java
+    Player player = new Player();
+    player.gameStart();
+    player.killMonster();
+    player.gainExperience();
+    player.next();
+    player.pick();
+    player.gameOver();
+    player.next();
+    player.killMonster();
+    player.pick();
+```
+
+### Outpu:
+
+```code
+-----Game Start, ready to fight-----
+
+Kill a Monster
+Gain 5 EXP
+Good! please enter next level
+Wow! You pick a good thing
+
+-----         Game Over        -----
+
+You want to challenge again?
+Please start game first
+Please start game first
+
+```
+
+
+
+
+## Strategy
+The strategy pattern is used to create an interchangeable family of algorithms from which the required process is chosen at run-time.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/strategy.png"/>
+
+
+### Example:
+
+```java
+public interface Strategy {
+    void transportation();
+}
+```
+
+```java
+public class Context {
+    private Strategy goToStrategy;
+    
+    public void setGoToStrategy(Strategy strategy) {
+        this.goToStrategy = strategy;
+    }
+
+    public void take() {
+        goToStrategy.transportation();
+    }
+}
+
+```
+
+```java
+public class GoToCairo implements Strategy{
+    @Override
+    public void transportation() {
+        System.out.println("take my car");
+    }
+}
+```
+
+```java
+public class GoToGona implements Strategy{
+    @Override
+    public void transportation() {
+        System.out.println("take plane");
+    }
+}
+```
+
+
+
+### Usage :
+
+```java
+    Context context = new Context();
+
+    context.setGoToStrategy(new GoToCairo());
+    context.take();
+
+    context.setGoToStrategy(new GoToGona());
+    context.take();
+```
+
+### Outpu:
+
+```code
+take my car
+take plane
+
+```
+
+
+
+
+## Visitor
+The visitor pattern is used to separate a relatively complex set of structured data classes from the functionality that may be performed upon the data that they hold.
+
+## UML :
+
+<img src="https://raw.githubusercontent.com/InnoFang/DesignPatterns/master/uml/visitor.png"/>
+
+
+### Example:
+
+```java
+public interface Interviewer {
+    void visit(Student student);
+    void visit(Engineer engineer);
+}
+
+```
+
+```java
+public interface Applicant {
+    void accept(Interviewer visitor);
+}
+```
+
+```java
+public class Engineer implements Applicant {
+
+    private String name;
+    private int workExperience;
+    private int projectNumber;
+
+    public Engineer(String name, int workExperience, int projectNumber) {
+        this.name = name;
+        this.workExperience = workExperience;
+        this.projectNumber = projectNumber;
+    }
+
+    @Override
+    public void accept(Interviewer visitor) {
+        visitor.visit(this);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getWorkExperience() {
+        return workExperience;
+    }
+
+    public void setWorkExperience(int workExperience) {
+        this.workExperience = workExperience;
+    }
+
+    public int getProjectNumber() {
+        return projectNumber;
+    }
+
+    public void setProjectNumber(int projectNumber) {
+        this.projectNumber = projectNumber;
+    }
+}
+```
+
+```java
+public class Student implements Applicant{
+    private String name;
+    private double gpa;
+    private String major;
+
+    public Student(String name, double gpa, String major) {
+        this.name = name;
+        this.gpa = gpa;
+        this.major = major;
+    }
+
+    @Override
+    public void accept(Interviewer visitor) {
+        visitor.visit(this);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public double getGpa() {
+        return gpa;
+    }
+
+    public void setGpa(double gpa) {
+        this.gpa = gpa;
+    }
+
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+}
+```
+
+```java
+public class Leader implements Interviewer {
+    @Override
+    public void visit(Student student) {
+        System.out.println("Student  " + student.getName() + "'s gpa is " + student.getGpa());
+    }
+
+    @Override
+    public void visit(Engineer engineer) {
+        System.out.println("Engineer  " + engineer.getName() + "'s number of projects is " + engineer.getProjectNumber());
+    }
+}
+```
+
+```java
+public class LaborMarket {
+
+    List<Applicant> applicants = new ArrayList<>();
+
+    {
+        applicants.add(new Student("Tamer",  3.2, "Computer Science"));
+        applicants.add(new Student("Mohamed",  3.4, "Network Engineer"));
+        applicants.add(new Student("Habiba",  3.4, "Computer Science"));
+        applicants.add(new Engineer("Ahmed",  4, 15));
+        applicants.add(new Engineer("Mohand",  3, 10));
+        applicants.add(new Engineer("Mohab",  6, 20));
+    }
+
+
+    public void showApplicants(Interviewer visitor) {
+        for (Applicant applicant : applicants) {
+            applicant.accept(visitor);
+        }
+    }
+}
+
+```
+
+
+
+### Usage :
+
+```java
+    LaborMarket laborMarket = new LaborMarket();
+    System.out.println("===== Round 1: Leader =====");
+    laborMarket.showApplicants(new Leader());
+
+    /*
+    You can add more rounds and implements .............
+     */
+```
+
+### Outpu:
+
+```code
+===== Round 1: Leader =====
+Student  Tamer's gpa is 3.2
+Student  Mohamed's gpa is 3.4
+Student  Habiba's gpa is 3.4
+Engineer  Ahmed's number of projects is 15
+Engineer  Mohand's number of projects is 10
+Engineer  Mohab's number of projects is 20
+
+```
+
+
+
+
+
+
 
 
 
